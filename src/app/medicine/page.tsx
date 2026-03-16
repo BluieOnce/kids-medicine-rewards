@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import PageHeader from "@/components/ui/PageHeader";
@@ -9,6 +9,14 @@ import Button from "@/components/ui/Button";
 import NavBar from "@/components/ui/NavBar";
 
 export default function MedicineListPage() {
+  return (
+    <Suspense>
+      <MedicineListContent />
+    </Suspense>
+  );
+}
+
+function MedicineListContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const childId = searchParams.get("childId");

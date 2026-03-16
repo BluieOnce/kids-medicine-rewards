@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
 
 export default function ConfirmDosePage() {
+  return (
+    <Suspense>
+      <ConfirmDoseContent />
+    </Suspense>
+  );
+}
+
+function ConfirmDoseContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const doseId = searchParams.get("doseId");

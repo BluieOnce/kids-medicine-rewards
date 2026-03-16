@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import PageHeader from "@/components/ui/PageHeader";
@@ -8,6 +8,14 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 
 export default function AddMedicinePage() {
+  return (
+    <Suspense>
+      <AddMedicineContent />
+    </Suspense>
+  );
+}
+
+function AddMedicineContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const childIdParam = searchParams.get("childId");
