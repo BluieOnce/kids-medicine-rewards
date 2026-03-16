@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/i18n";
 
 const PATTERN = [1, 0, 1, 0, 1, 1, 0, 1]; // 1 = tap, 0 = rest
 const BEAT_MS = 500;
 
 export default function TapRhythm() {
+  const { t } = useTranslation();
   const [running, setRunning] = useState(false);
   const [beatIndex, setBeatIndex] = useState(0);
   const [tapped, setTapped] = useState(false);
@@ -75,12 +77,12 @@ export default function TapRhythm() {
         className="w-40 h-40 rounded-full flex items-center justify-center
           text-white text-xl font-bold shadow-lg mb-6"
       >
-        {running ? (currentShouldTap ? "TAP!" : "wait") : "Start"}
+        {running ? (currentShouldTap ? t("tap.tap") : t("tap.wait")) : t("tap.start")}
       </motion.button>
 
       {/* Score */}
       <p className="text-2xl font-bold text-gray-700">
-        Score: {score}
+        {t("tap.score", { score })}
       </p>
 
       {running && (
@@ -88,13 +90,12 @@ export default function TapRhythm() {
           onClick={() => setRunning(false)}
           className="mt-4 text-sm text-gray-400"
         >
-          Stop
+          {t("tap.stop")}
         </button>
       )}
 
       <p className="text-gray-400 text-xs mt-6 text-center max-w-xs">
-        Follow the pattern! Tap when the blue circles light up.
-        Focusing on rhythm helps distract from worry.
+        {t("tap.helpText")}
       </p>
     </div>
   );

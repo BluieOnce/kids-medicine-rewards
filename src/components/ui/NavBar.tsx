@@ -2,16 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "@/i18n";
 
 const navItems = [
-  { href: "/dashboard", label: "Home", icon: "🏠" },
-  { href: "/calm-tools", label: "Calm", icon: "🫧" },
-  { href: "/games", label: "Games", icon: "🎮" },
-  { href: "/reward", label: "Rewards", icon: "⭐" },
+  { href: "/dashboard", labelKey: "nav.home", icon: "🏠" },
+  { href: "/calm-tools", labelKey: "nav.calm", icon: "🫧" },
+  { href: "/games", labelKey: "nav.games", icon: "🎮" },
+  { href: "/reward", labelKey: "nav.rewards", icon: "⭐" },
 ];
 
 export default function NavBar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-bottom z-50">
@@ -26,7 +28,7 @@ export default function NavBar() {
                 ${active ? "text-blue-600" : "text-gray-400"}`}
             >
               <span className="text-2xl">{item.icon}</span>
-              <span className="text-xs font-medium">{item.label}</span>
+              <span className="text-xs font-medium">{t(item.labelKey)}</span>
             </Link>
           );
         })}

@@ -10,6 +10,7 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import ProgressBar from "@/components/ui/ProgressBar";
 import StarDisplay from "@/components/ui/StarDisplay";
+import { useTranslation } from "@/i18n";
 
 const petEmojis: Record<PetType, string> = {
   cat: "🐱",
@@ -18,15 +19,9 @@ const petEmojis: Record<PetType, string> = {
   dragon: "🐲",
 };
 
-const petOptions: { type: PetType; label: string }[] = [
-  { type: "cat", label: "Cat" },
-  { type: "dog", label: "Dog" },
-  { type: "bunny", label: "Bunny" },
-  { type: "dragon", label: "Dragon" },
-];
-
 export default function PetPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const {
     activeChildId,
     loadData,
@@ -44,6 +39,13 @@ export default function PetPage() {
     loadData();
   }, [loadData]);
 
+  const petOptions: { type: PetType; labelKey: string }[] = [
+    { type: "cat", labelKey: "pet.cat" },
+    { type: "dog", labelKey: "pet.dog" },
+    { type: "bunny", labelKey: "pet.bunny" },
+    { type: "dragon", labelKey: "pet.dragon" },
+  ];
+
   const pet = activeChildId ? getPet(activeChildId) : null;
   const rewards = activeChildId ? getRewards(activeChildId) : null;
 
@@ -51,23 +53,24 @@ export default function PetPage() {
   if (activeChildId && !pet) {
     return (
       <div className="pb-8">
-        <PageHeader title="Choose Your Pet" showBack />
+        <PageHeader title={t("pet.chooseTitle")} showBack />
         <div className="px-4 space-y-4 mt-4">
           <p className="text-gray-500 text-center">
-            Pick a pet to take care of!
+            {t("pet.pickInstruction")}
           </p>
           <div className="grid grid-cols-2 gap-3">
             {petOptions.map((opt) => (
               <Card
                 key={opt.type}
                 onClick={() => {
-                  const name = prompt(`Name your ${opt.label}:`) || opt.label;
+                  const label = t(opt.labelKey);
+                  const name = prompt(t("pet.namePrompt", { type: label })) || label;
                   createPet(activeChildId, opt.type, name);
                 }}
                 className="text-center py-6"
               >
                 <span className="text-6xl">{petEmojis[opt.type]}</span>
-                <p className="mt-2 font-medium">{opt.label}</p>
+                <p className="mt-2 font-medium">{t(opt.labelKey)}</p>
               </Card>
             ))}
           </div>
@@ -79,7 +82,7 @@ export default function PetPage() {
   if (!pet || !activeChildId) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
-        <p className="text-gray-400">Select a child first</p>
+        <p className="text-gray-400">{t("reward.selectChild")}</p>
       </div>
     );
   }
@@ -102,6 +105,8 @@ export default function PetPage() {
   // Re-read after actions
   const currentPet = getPet(activeChildId);
   const currentRewards = getRewards(activeChildId);
+
+  const petTypeKey = `pet.${pet.petType}` as const;
 
   return (
     <div className="pb-8">
@@ -154,7 +159,10 @@ export default function PetPage() {
           </AnimatePresence>
 
           <p className="text-sm text-gray-400">
-            Level {currentPet?.level || pet.level} {pet.petType}
+            {t("pet.level", {
+              level: currentPet?.level || pet.level,
+              type: t(petTypeKey),
+            })}
           </p>
         </Card>
 
@@ -163,7 +171,7 @@ export default function PetPage() {
           <div className="space-y-3">
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span>Hunger</span>
+                <span>{t("pet.hunger")}</span>
                 <span>{currentPet?.hunger || pet.hunger}/100</span>
               </div>
               <ProgressBar
@@ -173,7 +181,7 @@ export default function PetPage() {
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span>Happiness</span>
+                <span>{t("pet.happiness")}</span>
                 <span>{currentPet?.happiness || pet.happiness}/100</span>
               </div>
               <ProgressBar
@@ -192,7 +200,7 @@ export default function PetPage() {
             className="w-full"
             size="lg"
           >
-            🍎 Feed (5⭐)
+            {t("pet.feed")}
           </Button>
           <Button
             onClick={handlePlay}
@@ -200,13 +208,13 @@ export default function PetPage() {
             className="w-full"
             size="lg"
           >
-            🎾 Play
+            {t("pet.play")}
           </Button>
         </div>
 
         {!canFeed && (
           <p className="text-center text-sm text-gray-400">
-            Earn more stars to feed your pet!
+            {t("pet.earnMore")}
           </p>
         )}
       </div>

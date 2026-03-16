@@ -7,6 +7,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import NavBar from "@/components/ui/NavBar";
+import { useTranslation } from "@/i18n";
 
 export default function MedicineListPage() {
   return (
@@ -20,6 +21,7 @@ function MedicineListContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const childId = searchParams.get("childId");
+  const { t } = useTranslation();
 
   const { medicines, children, activeChildId, loadData, deleteMedicine, updateMedicine } =
     useAppStore();
@@ -37,7 +39,7 @@ function MedicineListContent() {
   return (
     <div className="pb-24">
       <PageHeader
-        title={child ? `${child.name}'s Medicines` : "Medicines"}
+        title={child ? t("medicine.title", { name: child.name }) : t("medicine.titleDefault")}
         showBack
       />
 
@@ -45,7 +47,7 @@ function MedicineListContent() {
         {childMedicines.length === 0 ? (
           <Card className="text-center py-8">
             <p className="text-4xl mb-2">💊</p>
-            <p className="text-gray-500 mb-3">No medicines yet</p>
+            <p className="text-gray-500 mb-3">{t("medicine.noMedicines")}</p>
           </Card>
         ) : (
           childMedicines.map((med) => (
@@ -55,12 +57,12 @@ function MedicineListContent() {
                   <p className="font-semibold">{med.name}</p>
                   <p className="text-sm text-gray-400">{med.dosage}</p>
                   <div className="flex gap-1 mt-1">
-                    {med.scheduleTimes.map((t) => (
+                    {med.scheduleTimes.map((t_time) => (
                       <span
-                        key={t}
+                        key={t_time}
                         className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full"
                       >
-                        {t}
+                        {t_time}
                       </span>
                     ))}
                   </div>
@@ -73,18 +75,18 @@ function MedicineListContent() {
                       updateMedicine({ ...med, active: !med.active })
                     }
                   >
-                    {med.active ? "Pause" : "Resume"}
+                    {med.active ? t("medicine.pause") : t("medicine.resume")}
                   </Button>
                   <Button
                     variant="danger"
                     size="sm"
                     onClick={() => {
-                      if (confirm(`Delete ${med.name}?`)) {
+                      if (confirm(t("medicine.confirmDelete", { name: med.name }))) {
                         deleteMedicine(med.id);
                       }
                     }}
                   >
-                    Delete
+                    {t("medicine.delete")}
                   </Button>
                 </div>
               </div>
@@ -100,7 +102,7 @@ function MedicineListContent() {
             )
           }
         >
-          + Add Medicine
+          {t("medicine.addMedicine")}
         </Button>
       </div>
 
