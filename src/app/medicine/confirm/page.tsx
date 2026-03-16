@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
+import { useTranslation } from "@/i18n";
 
 export default function ConfirmDosePage() {
   return (
@@ -18,6 +19,7 @@ function ConfirmDoseContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const doseId = searchParams.get("doseId");
+  const { t } = useTranslation();
 
   const { doses, medicines, completeDose, skipDose, loadData } = useAppStore();
   const [showReward, setShowReward] = useState(false);
@@ -35,7 +37,7 @@ function ConfirmDoseContent() {
   if (!dose || !medicine) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
-        <p className="text-gray-400">Dose not found</p>
+        <p className="text-gray-400">{t("medicine.doseNotFound")}</p>
       </div>
     );
   }
@@ -71,7 +73,7 @@ function ConfirmDoseContent() {
           transition={{ delay: 0.3 }}
           className="text-3xl font-bold text-amber-600 mb-2"
         >
-          Amazing!
+          {t("medicine.amazing")}
         </motion.h1>
 
         <motion.p
@@ -80,7 +82,7 @@ function ConfirmDoseContent() {
           transition={{ delay: 0.5 }}
           className="text-xl text-gray-600 mb-2"
         >
-          You earned {earnedStars} stars!
+          {t("medicine.earnedStars", { stars: earnedStars })}
         </motion.p>
 
         {/* Floating stars animation */}
@@ -119,14 +121,14 @@ function ConfirmDoseContent() {
             size="lg"
             onClick={() => router.push("/reward")}
           >
-            See My Rewards
+            {t("medicine.seeRewards")}
           </Button>
           <Button
             variant="secondary"
             className="w-full"
             onClick={() => router.push("/dashboard")}
           >
-            Back Home
+            {t("medicine.backHome")}
           </Button>
         </motion.div>
       </div>
@@ -145,7 +147,7 @@ function ConfirmDoseContent() {
       </motion.div>
 
       <h1 className="text-2xl font-bold text-gray-800 mb-2">
-        Time for medicine!
+        {t("medicine.timeForMedicine")}
       </h1>
 
       <p className="text-lg text-gray-500 mb-1">{medicine.name}</p>
@@ -158,11 +160,11 @@ function ConfirmDoseContent() {
           onClick={() => router.push("/calm-tools")}
           variant="secondary"
         >
-          🫧 Need to calm down first?
+          {t("medicine.needCalm")}
         </Button>
 
         <Button className="w-full" size="lg" onClick={handleComplete}>
-          ✅ I took my medicine!
+          {t("medicine.iTookIt")}
         </Button>
 
         <Button
@@ -170,7 +172,7 @@ function ConfirmDoseContent() {
           className="w-full"
           onClick={handleSkip}
         >
-          Skip this time
+          {t("medicine.skip")}
         </Button>
       </div>
     </div>

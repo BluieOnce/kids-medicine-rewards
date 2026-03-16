@@ -6,6 +6,7 @@ import { useAppStore } from "@/store/useAppStore";
 import PageHeader from "@/components/ui/PageHeader";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import { useTranslation } from "@/i18n";
 
 export default function AddMedicinePage() {
   return (
@@ -19,6 +20,7 @@ function AddMedicineContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const childIdParam = searchParams.get("childId");
+  const { t } = useTranslation();
 
   const { children, activeChildId, addMedicine, loadData } = useAppStore();
 
@@ -55,14 +57,14 @@ function AddMedicineContent() {
 
   return (
     <div className="pb-8">
-      <PageHeader title="Add Medicine" showBack />
+      <PageHeader title={t("medicine.addTitle")} showBack />
 
       <div className="px-4 space-y-5 mt-4">
         {/* Select child if multiple */}
         {children.length > 1 && !childIdParam && (
           <Card>
             <p className="text-sm font-medium text-gray-500 mb-2">
-              For which child?
+              {t("medicine.forWhichChild")}
             </p>
             <div className="flex gap-2 flex-wrap">
               {children.map((child) => (
@@ -88,13 +90,13 @@ function AddMedicineContent() {
         {/* Medicine name */}
         <div>
           <label className="block text-sm font-medium text-gray-500 mb-2">
-            Medicine Name
+            {t("medicine.medicineName")}
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Amoxicillin"
+            placeholder={t("medicine.namePlaceholder")}
             className="w-full px-4 py-3 rounded-2xl bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
@@ -102,13 +104,13 @@ function AddMedicineContent() {
         {/* Dosage */}
         <div>
           <label className="block text-sm font-medium text-gray-500 mb-2">
-            Dosage
+            {t("medicine.dosage")}
           </label>
           <input
             type="text"
             value={dosage}
             onChange={(e) => setDosage(e.target.value)}
-            placeholder="e.g. 5ml, 1 tablet"
+            placeholder={t("medicine.dosagePlaceholder")}
             className="w-full px-4 py-3 rounded-2xl bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
@@ -116,7 +118,7 @@ function AddMedicineContent() {
         {/* Schedule times */}
         <div>
           <label className="block text-sm font-medium text-gray-500 mb-2">
-            Schedule Times
+            {t("medicine.scheduleTimes")}
           </label>
           <div className="space-y-2">
             {times.map((time, i) => (
@@ -142,7 +144,7 @@ function AddMedicineContent() {
             onClick={addTime}
             className="mt-2 text-sm text-blue-500 font-medium"
           >
-            + Add another time
+            {t("medicine.addAnotherTime")}
           </button>
         </div>
 
@@ -152,7 +154,7 @@ function AddMedicineContent() {
           onClick={handleSubmit}
           disabled={!name.trim() || !dosage.trim() || !effectiveChildId}
         >
-          Save Medicine
+          {t("medicine.save")}
         </Button>
       </div>
     </div>

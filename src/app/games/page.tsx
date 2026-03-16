@@ -4,13 +4,15 @@ import { useRouter } from "next/navigation";
 import NavBar from "@/components/ui/NavBar";
 import PageHeader from "@/components/ui/PageHeader";
 import Card from "@/components/ui/Card";
+import { useTranslation } from "@/i18n";
 
 export default function GamesPage() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <div className="pb-24">
-      <PageHeader title="Games" />
+      <PageHeader title={t("games.title")} />
 
       <div className="px-4 space-y-4 mt-4">
         <Card
@@ -20,9 +22,9 @@ export default function GamesPage() {
           <div className="flex items-center gap-4">
             <span className="text-5xl">🎈</span>
             <div>
-              <h3 className="font-semibold text-lg">Balloon Pop</h3>
+              <h3 className="font-semibold text-lg">{t("games.balloonPop")}</h3>
               <p className="text-sm text-gray-400">
-                Pop as many balloons as you can in 30 seconds!
+                {t("games.balloonPopDesc")}
               </p>
             </div>
           </div>
@@ -32,9 +34,9 @@ export default function GamesPage() {
           <div className="flex items-center gap-4">
             <span className="text-5xl">🧩</span>
             <div>
-              <h3 className="font-semibold text-lg">More games soon!</h3>
+              <h3 className="font-semibold text-lg">{t("games.moreGamesSoon")}</h3>
               <p className="text-sm text-gray-400">
-                New games are on the way.
+                {t("games.moreGamesDesc")}
               </p>
             </div>
           </div>

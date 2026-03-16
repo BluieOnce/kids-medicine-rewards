@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/i18n";
 
 interface Star {
   id: number;
@@ -10,6 +11,7 @@ interface Star {
 }
 
 export default function CountingStars() {
+  const { t } = useTranslation();
   const [stars, setStars] = useState<Star[]>([]);
   const [count, setCount] = useState(0);
   const [nextId, setNextId] = useState(0);
@@ -38,7 +40,7 @@ export default function CountingStars() {
       {/* Counter */}
       <div className="text-center mt-4 mb-4">
         <p className="text-4xl font-bold text-amber-500">{count}</p>
-        <p className="text-sm text-gray-400">stars caught</p>
+        <p className="text-sm text-gray-400">{t("counting.starsCaught")}</p>
       </div>
 
       {/* Star field */}
@@ -74,7 +76,7 @@ export default function CountingStars() {
               }}
               className="px-8 py-3 bg-amber-400 rounded-full text-white font-bold text-lg shadow-lg"
             >
-              Start!
+              {t("counting.start")}
             </button>
           </div>
         )}
@@ -85,13 +87,12 @@ export default function CountingStars() {
           onClick={() => setRunning(false)}
           className="mt-4 text-sm text-gray-400"
         >
-          Stop
+          {t("counting.stop")}
         </button>
       )}
 
       <p className="text-gray-400 text-xs mt-4 text-center max-w-xs">
-        Tap each star as it appears! Counting and focusing
-        helps your brain feel calm and brave.
+        {t("counting.helpText")}
       </p>
     </div>
   );

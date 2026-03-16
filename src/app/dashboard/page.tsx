@@ -11,9 +11,11 @@ import StarDisplay from "@/components/ui/StarDisplay";
 import ProgressBar from "@/components/ui/ProgressBar";
 import PageHeader from "@/components/ui/PageHeader";
 import { Dose } from "@/types";
+import { useTranslation } from "@/i18n";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { t, locale, setLocale } = useTranslation();
   const {
     children,
     medicines,
@@ -61,9 +63,9 @@ export default function DashboardPage() {
   if (children.length === 0) {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center px-6 text-center">
-        <p className="text-gray-500 mb-4">No children added yet</p>
+        <p className="text-gray-500 mb-4">{t("dashboard.noChildren")}</p>
         <Button onClick={() => router.push("/child/new")}>
-          Add Child
+          {t("dashboard.addChild")}
         </Button>
       </div>
     );
@@ -72,14 +74,26 @@ export default function DashboardPage() {
   return (
     <div className="pb-24">
       <PageHeader
-        title={`Hi, ${activeChild?.name || "there"}! ${activeChild?.avatar || ""}`}
+        title={t("dashboard.greeting", {
+          name: activeChild?.name || "there",
+          avatar: activeChild?.avatar || "",
+        })}
         rightElement={
-          <button
-            onClick={() => router.push("/child")}
-            className="text-sm text-blue-500 font-medium"
-          >
-            Settings
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setLocale(locale === "he" ? "en" : "he")}
+              className="text-sm px-2 py-1 rounded-lg bg-gray-100 font-medium"
+              title={t("language")}
+            >
+              {locale === "he" ? "EN" : "HE"}
+            </button>
+            <button
+              onClick={() => router.push("/child")}
+              className="text-sm text-blue-500 font-medium"
+            >
+              {t("dashboard.settings")}
+            </button>
+          </div>
         }
       />
 
@@ -108,20 +122,20 @@ export default function DashboardPage() {
         <div className="flex gap-3">
           <Card className="flex-1 text-center">
             <StarDisplay count={rewards?.stars || 0} size="lg" />
-            <p className="text-xs text-gray-400 mt-1">Stars</p>
+            <p className="text-xs text-gray-400 mt-1">{t("dashboard.stars")}</p>
           </Card>
           <Card className="flex-1 text-center">
             <p className="text-4xl font-bold text-orange-500">
               {streak?.current || 0}
             </p>
-            <p className="text-xs text-gray-400 mt-1">Day Streak</p>
+            <p className="text-xs text-gray-400 mt-1">{t("dashboard.dayStreak")}</p>
           </Card>
         </div>
 
         {/* Today's Progress */}
         <Card>
           <div className="flex justify-between items-center mb-2">
-            <h2 className="font-semibold text-gray-700">Today&apos;s Medicines</h2>
+            <h2 className="font-semibold text-gray-700">{t("dashboard.todaysMedicines")}</h2>
             <span className="text-sm text-gray-400">
               {completedCount}/{todayDoses.length}
             </span>
@@ -157,7 +171,7 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">
-                          {med?.name || "Medicine"}
+                          {med?.name || t("dashboard.medicine")}
                         </p>
                         <p className="text-sm text-gray-400">
                           {med?.dosage} · {time}
@@ -178,17 +192,17 @@ export default function DashboardPage() {
         ) : childMedicines.length === 0 ? (
           <Card className="text-center py-8">
             <p className="text-4xl mb-2">💊</p>
-            <p className="text-gray-500 mb-3">No medicines added yet</p>
+            <p className="text-gray-500 mb-3">{t("dashboard.noMedicines")}</p>
             <Button
               size="sm"
               onClick={() => router.push("/medicine/add")}
             >
-              Add Medicine
+              {t("dashboard.addMedicine")}
             </Button>
           </Card>
         ) : (
           <Card className="text-center py-8">
-            <p className="text-gray-500">All done for today! 🎉</p>
+            <p className="text-gray-500">{t("dashboard.allDone")}</p>
           </Card>
         )}
 
@@ -199,14 +213,14 @@ export default function DashboardPage() {
             className="text-center py-5"
           >
             <p className="text-3xl mb-1">🫧</p>
-            <p className="text-sm font-medium text-gray-600">Calm Tools</p>
+            <p className="text-sm font-medium text-gray-600">{t("dashboard.calmTools")}</p>
           </Card>
           <Card
             onClick={() => router.push("/reward/pet")}
             className="text-center py-5"
           >
             <p className="text-3xl mb-1">🐾</p>
-            <p className="text-sm font-medium text-gray-600">My Pet</p>
+            <p className="text-sm font-medium text-gray-600">{t("dashboard.myPet")}</p>
           </Card>
         </div>
 
@@ -218,7 +232,7 @@ export default function DashboardPage() {
             className="flex-1"
             onClick={() => router.push("/medicine/add")}
           >
-            + Medicine
+            {t("dashboard.plusMedicine")}
           </Button>
           <Button
             variant="secondary"
@@ -226,7 +240,7 @@ export default function DashboardPage() {
             className="flex-1"
             onClick={() => router.push("/child/new")}
           >
-            + Child
+            {t("dashboard.plusChild")}
           </Button>
         </div>
       </div>

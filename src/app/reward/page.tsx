@@ -8,9 +8,11 @@ import Card from "@/components/ui/Card";
 import StarDisplay from "@/components/ui/StarDisplay";
 import PageHeader from "@/components/ui/PageHeader";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/i18n";
 
 export default function RewardPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { activeChildId, children, loadData, getRewards, getStreak } =
     useAppStore();
 
@@ -25,14 +27,14 @@ export default function RewardPage() {
   if (!activeChildId || !child) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
-        <p className="text-gray-400">Select a child first</p>
+        <p className="text-gray-400">{t("reward.selectChild")}</p>
       </div>
     );
   }
 
   return (
     <div className="pb-24">
-      <PageHeader title="Rewards" />
+      <PageHeader title={t("reward.title")} />
 
       <div className="px-4 space-y-4 mt-4">
         {/* Stars */}
@@ -42,7 +44,7 @@ export default function RewardPage() {
         >
           <Card className="text-center py-6 bg-gradient-to-br from-amber-50 to-yellow-50">
             <StarDisplay count={rewards?.stars || 0} size="lg" />
-            <p className="text-gray-500 mt-1">Total Stars</p>
+            <p className="text-gray-500 mt-1">{t("reward.totalStars")}</p>
           </Card>
         </motion.div>
 
@@ -57,7 +59,7 @@ export default function RewardPage() {
               <p className="text-4xl font-bold text-orange-500">
                 🔥 {streak?.current || 0}
               </p>
-              <p className="text-xs text-gray-400 mt-1">Current Streak</p>
+              <p className="text-xs text-gray-400 mt-1">{t("reward.currentStreak")}</p>
             </Card>
           </motion.div>
           <motion.div
@@ -69,26 +71,26 @@ export default function RewardPage() {
               <p className="text-4xl font-bold text-purple-500">
                 🏆 {streak?.best || 0}
               </p>
-              <p className="text-xs text-gray-400 mt-1">Best Streak</p>
+              <p className="text-xs text-gray-400 mt-1">{t("reward.bestStreak")}</p>
             </Card>
           </motion.div>
         </div>
 
         {/* How to earn */}
         <Card>
-          <h3 className="font-semibold mb-3">How to earn stars</h3>
+          <h3 className="font-semibold mb-3">{t("reward.howToEarn")}</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-600">On-time dose</span>
+              <span className="text-gray-600">{t("reward.onTimeDose")}</span>
               <span className="font-medium text-amber-500">+10 ⭐</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Late dose</span>
+              <span className="text-gray-600">{t("reward.lateDose")}</span>
               <span className="font-medium text-amber-500">+5 ⭐</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">All done today</span>
-              <span className="font-medium text-amber-500">+10 ⭐ bonus</span>
+              <span className="text-gray-600">{t("reward.allDoneToday")}</span>
+              <span className="font-medium text-amber-500">{t("reward.bonus")}</span>
             </div>
           </div>
         </Card>
@@ -100,15 +102,15 @@ export default function RewardPage() {
             className="text-center py-5"
           >
             <p className="text-3xl mb-1">🐾</p>
-            <p className="text-sm font-medium text-gray-600">Feed Pet</p>
-            <p className="text-xs text-gray-400">5 stars</p>
+            <p className="text-sm font-medium text-gray-600">{t("reward.feedPet")}</p>
+            <p className="text-xs text-gray-400">{t("reward.fiveStars")}</p>
           </Card>
           <Card
             onClick={() => router.push("/games")}
             className="text-center py-5"
           >
             <p className="text-3xl mb-1">🎮</p>
-            <p className="text-sm font-medium text-gray-600">Play Game</p>
+            <p className="text-sm font-medium text-gray-600">{t("reward.playGame")}</p>
           </Card>
         </div>
       </div>

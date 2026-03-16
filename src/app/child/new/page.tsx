@@ -8,21 +8,24 @@ import PageHeader from "@/components/ui/PageHeader";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/i18n";
 
 const avatars = ["🦸", "🧒", "👧", "👦", "🧑", "🦹", "🧚", "🦄"];
-const ageGroups: { value: AgeGroup; label: string }[] = [
-  { value: "toddler", label: "Toddler (2-4)" },
-  { value: "child", label: "Child (5-8)" },
-  { value: "preteen", label: "Preteen (9-12)" },
-];
 
 export default function NewChildPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { addChild, setActiveChild } = useAppStore();
 
   const [name, setName] = useState("");
   const [ageGroup, setAgeGroup] = useState<AgeGroup>("child");
   const [avatar, setAvatar] = useState("🦸");
+
+  const ageGroups: { value: AgeGroup; label: string }[] = [
+    { value: "toddler", label: t("child.toddler") },
+    { value: "child", label: t("child.child") },
+    { value: "preteen", label: t("child.preteen") },
+  ];
 
   const handleSubmit = () => {
     if (!name.trim()) return;
@@ -33,13 +36,13 @@ export default function NewChildPage() {
 
   return (
     <div className="pb-8">
-      <PageHeader title="Add Child" showBack />
+      <PageHeader title={t("child.addTitle")} showBack />
 
       <div className="px-4 space-y-6 mt-4">
         {/* Avatar */}
         <Card>
           <p className="text-sm font-medium text-gray-500 mb-3">
-            Choose an avatar
+            {t("child.chooseAvatar")}
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             {avatars.map((a) => (
@@ -59,13 +62,13 @@ export default function NewChildPage() {
         {/* Name */}
         <div>
           <label className="block text-sm font-medium text-gray-500 mb-2">
-            Name
+            {t("child.name")}
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Child's name"
+            placeholder={t("child.namePlaceholder")}
             className="w-full px-4 py-3 rounded-2xl bg-white border border-gray-200 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             maxLength={50}
           />
@@ -74,7 +77,7 @@ export default function NewChildPage() {
         {/* Age Group */}
         <div>
           <label className="block text-sm font-medium text-gray-500 mb-2">
-            Age Group
+            {t("child.ageGroup")}
           </label>
           <div className="flex gap-2">
             {ageGroups.map((ag) => (
@@ -100,7 +103,7 @@ export default function NewChildPage() {
           onClick={handleSubmit}
           disabled={!name.trim()}
         >
-          Add {name || "Child"}
+          {name ? t("child.addButton", { name }) : t("child.addButtonDefault")}
         </Button>
       </div>
     </div>

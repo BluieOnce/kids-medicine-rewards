@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { TranslationProvider } from "@/i18n";
 
 export const metadata: Metadata = {
   title: "Medicine Heroes",
@@ -20,9 +21,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="he" dir="rtl" suppressHydrationWarning>
       <body className="bg-gradient-to-b from-blue-50 to-purple-50 min-h-dvh">
-        {children}
+        <TranslationProvider>
+          {children}
+        </TranslationProvider>
       </body>
     </html>
   );

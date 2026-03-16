@@ -2,26 +2,28 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/i18n";
 
 type Phase = "inhale" | "hold" | "exhale" | "rest";
 
-const phases: { phase: Phase; duration: number; label: string }[] = [
-  { phase: "inhale", duration: 4000, label: "Breathe in..." },
-  { phase: "hold", duration: 2000, label: "Hold..." },
-  { phase: "exhale", duration: 4000, label: "Breathe out..." },
-  { phase: "rest", duration: 1000, label: "..." },
-];
-
 export default function BreathingExercise() {
+  const { t } = useTranslation();
   const [running, setRunning] = useState(false);
   const [phaseIdx, setPhaseIdx] = useState(0);
   const [cycles, setCycles] = useState(0);
+
+  const phases: { phase: Phase; duration: number; label: string }[] = [
+    { phase: "inhale", duration: 4000, label: t("breathing.breatheIn") },
+    { phase: "hold", duration: 2000, label: t("breathing.hold") },
+    { phase: "exhale", duration: 4000, label: t("breathing.breatheOut") },
+    { phase: "rest", duration: 1000, label: "..." },
+  ];
 
   const currentPhase = phases[phaseIdx];
 
   const advancePhase = useCallback(() => {
     setPhaseIdx((prev) => {
-      const next = (prev + 1) % phases.length;
+      const next = (prev + 1) % 4;
       if (next === 0) setCycles((c) => c + 1);
       return next;
     });
@@ -60,14 +62,16 @@ export default function BreathingExercise() {
           shadow-lg flex items-center justify-center mb-8`}
       >
         <span className="text-white text-xl font-medium text-center">
-          {running ? currentPhase.label : "Tap to start"}
+          {running ? currentPhase.label : t("breathing.tapToStart")}
         </span>
       </motion.div>
 
       {/* Cycle counter */}
       {cycles > 0 && (
         <p className="text-gray-400 text-sm mb-4">
-          {cycles} breath{cycles !== 1 ? "s" : ""} completed
+          {cycles !== 1
+            ? t("breathing.breathsCompletedPlural", { count: cycles })
+            : t("breathing.breathsCompleted", { count: cycles })}
         </p>
       )}
 
@@ -86,12 +90,11 @@ export default function BreathingExercise() {
               : "bg-blue-500 text-white"
           }`}
       >
-        {running ? "Stop" : "Start Breathing"}
+        {running ? t("breathing.stop") : t("breathing.startBreathing")}
       </button>
 
       <p className="text-gray-400 text-xs mt-6 text-center max-w-xs">
-        Take slow, deep breaths with the bubble.
-        This helps your body feel calm and ready.
+        {t("breathing.helpText")}
       </p>
     </div>
   );

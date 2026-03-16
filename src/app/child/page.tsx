@@ -7,9 +7,11 @@ import PageHeader from "@/components/ui/PageHeader";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import NavBar from "@/components/ui/NavBar";
+import { useTranslation } from "@/i18n";
 
 export default function ChildListPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { children, loadData, deleteChild } = useAppStore();
 
   useEffect(() => {
@@ -18,7 +20,7 @@ export default function ChildListPage() {
 
   return (
     <div className="pb-24">
-      <PageHeader title="Children" showBack />
+      <PageHeader title={t("child.title")} showBack />
 
       <div className="px-4 space-y-3 mt-4">
         {children.map((child) => (
@@ -39,18 +41,18 @@ export default function ChildListPage() {
                   size="sm"
                   onClick={() => router.push(`/medicine?childId=${child.id}`)}
                 >
-                  Medicines
+                  {t("child.medicines")}
                 </Button>
                 <Button
                   variant="danger"
                   size="sm"
                   onClick={() => {
-                    if (confirm(`Remove ${child.name}?`)) {
+                    if (confirm(t("child.confirmRemove", { name: child.name }))) {
                       deleteChild(child.id);
                     }
                   }}
                 >
-                  Remove
+                  {t("child.remove")}
                 </Button>
               </div>
             </div>
@@ -61,7 +63,7 @@ export default function ChildListPage() {
           className="w-full"
           onClick={() => router.push("/child/new")}
         >
-          + Add Child
+          {t("child.addChild")}
         </Button>
       </div>
 

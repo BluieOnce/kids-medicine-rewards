@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
+import { useTranslation } from "@/i18n";
 
 interface Balloon {
   id: number;
@@ -25,6 +26,7 @@ const COLORS = [
 const GAME_DURATION = 30; // seconds
 
 export default function BalloonPopGame() {
+  const { t } = useTranslation();
   const [gameState, setGameState] = useState<"idle" | "playing" | "done">(
     "idle"
   );
@@ -95,12 +97,12 @@ export default function BalloonPopGame() {
         >
           🎈
         </motion.span>
-        <h2 className="text-2xl font-bold mb-2">Balloon Pop!</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("balloon.title")}</h2>
         <p className="text-gray-500 mb-6">
-          Pop as many balloons as you can in {GAME_DURATION} seconds!
+          {t("balloon.instructions", { seconds: GAME_DURATION })}
         </p>
         <Button size="lg" onClick={startGame}>
-          Start Game
+          {t("balloon.startGame")}
         </Button>
       </div>
     );
@@ -123,7 +125,7 @@ export default function BalloonPopGame() {
           transition={{ delay: 0.2 }}
           className="text-3xl font-bold mt-4 mb-2"
         >
-          Great job!
+          {t("balloon.greatJob")}
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
@@ -131,12 +133,11 @@ export default function BalloonPopGame() {
           transition={{ delay: 0.4 }}
           className="text-xl text-gray-600 mb-6"
         >
-          You popped <span className="font-bold text-blue-500">{score}</span>{" "}
-          balloons!
+          {t("balloon.youPopped", { score })}
         </motion.p>
         <div className="space-y-3 w-full">
           <Button size="lg" className="w-full" onClick={startGame}>
-            Play Again
+            {t("balloon.playAgain")}
           </Button>
         </div>
       </div>
@@ -149,7 +150,7 @@ export default function BalloonPopGame() {
       {/* HUD */}
       <div className="sticky top-0 z-30 flex justify-between items-center px-4 py-2 bg-white/80 backdrop-blur-sm">
         <div className="text-lg font-bold text-blue-500">
-          Score: {score}
+          {t("balloon.score", { score })}
         </div>
         <div
           className={`text-lg font-bold ${
