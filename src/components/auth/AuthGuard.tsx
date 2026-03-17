@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { onAuthChange, AppUser } from "@/lib/auth";
 import { setStoragePrefix } from "@/data/storage/localStorage";
 import { motion } from "framer-motion";
 
@@ -16,7 +15,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
 
   useEffect(() => {
-    // Check if Firebase is configured
+    // Dynamic import to avoid SSR issues — Firebase should only load on the client
     const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
     if (!apiKey) {
       // Firebase not configured — skip auth, allow all access
@@ -24,17 +23,20 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       return;
     }
 
-    const unsubscribe = onAuthChange((user: AppUser | null) => {
-      if (user) {
-        // Scope localStorage data by user ID
-        setStoragePrefix(user.uid);
-        setStatus("authenticated");
-      } else {
-        setStatus("unauthenticated");
-      }
-    });
+    // Lazy-load auth module to prevent Firebase from initializing during SSR
+    import("@/lib/auth").then(({ onAuthChange }) => {
+      const unsubscribe = onAuthChange((user) => {
+        if (user) {
+          setStoragePrefix(user.uid);
+          setStatus("authenticated");
+        } else {
+          setStatus("unauthenticated");
+        }
+      });
 
-    return unsubscribe;
+      // Store cleanup function
+      return () => unsubscribe();
+    });
   }, []);
 
   useEffect(() => {
@@ -62,7 +64,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }
 
   if (status === "unauthenticated" && pathname !== "/login") {
-    return null; // Will redirect
+    return null;
   }
 
   return <>{children}</>;

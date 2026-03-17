@@ -5,7 +5,7 @@ import {
   onAuthStateChanged,
   User,
 } from "firebase/auth";
-import { auth } from "./firebase";
+import { getFirebaseAuth, isFirebaseConfigured } from "./firebase";
 
 export interface AppUser {
   uid: string;
@@ -24,18 +24,28 @@ function toAppUser(user: User): AppUser {
 }
 
 export async function signInWithGoogle(): Promise<AppUser> {
+  const auth = getFirebaseAuth();
+  if (!auth) throw new Error("Firebase is not configured");
   const provider = new GoogleAuthProvider();
   const result = await signInWithPopup(auth, provider);
   return toAppUser(result.user);
 }
 
 export async function signOut(): Promise<void> {
+  const auth = getFirebaseAuth();
+  if (!auth) return;
   await firebaseSignOut(auth);
 }
 
 export function onAuthChange(
   callback: (user: AppUser | null) => void
 ): () => void {
+  const auth = getFirebaseAuth();
+  if (!auth) {
+    // Firebase not available — treat as no auth
+    callback(null);
+    return () => {};
+  }
   return onAuthStateChanged(auth, (user) => {
     callback(user ? toAppUser(user) : null);
   });

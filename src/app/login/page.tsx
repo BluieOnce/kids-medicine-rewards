@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithGoogle } from "@/lib/auth";
 import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import { useTranslation } from "@/i18n";
@@ -17,6 +16,8 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
+      // Dynamic import to avoid Firebase loading during SSR
+      const { signInWithGoogle } = await import("@/lib/auth");
       await signInWithGoogle();
       router.replace("/dashboard");
     } catch (err: unknown) {
