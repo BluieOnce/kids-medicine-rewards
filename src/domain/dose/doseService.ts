@@ -48,7 +48,7 @@ export const doseService = {
     return newDoses;
   },
 
-  completeDose(doseId: string): Dose | null {
+  completeDose(doseId: string, grantReward: boolean = true): Dose | null {
     const dose = doseRepository.getById(doseId);
     if (!dose || dose.status !== "pending") return null;
 
@@ -64,7 +64,7 @@ export const doseService = {
       ...dose,
       status,
       completedAt: now.toISOString(),
-      rewardGranted: true,
+      rewardGranted: grantReward,
     };
 
     doseRepository.save(updated);

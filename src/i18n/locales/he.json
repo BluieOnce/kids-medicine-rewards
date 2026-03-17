@@ -225,5 +225,26 @@
   "settings.title": "הגדרות",
   "settings.user": "משתמש",
   "settings.statistics": "סטטיסטיקות",
-  "settings.manageChildren": "ניהול ילדים"
+  "settings.manageChildren": "ניהול ילדים",
+
+  "wizard.medicineFor": "התרופה של {name}",
+  "wizard.startMedicineTime": "מתחילים זמן תרופה",
+  "wizard.skipForNow": "דלג לעכשיו",
+  "wizard.feelingNervous": "מרגישים מתוחים?",
+  "wizard.tryCalmFirst": "נסו כלי הרגעה קודם",
+  "wizard.imReady": "!אני מוכן",
+  "wizard.backToCalm": "חזרה",
+  "wizard.didChildTake": "האם {name} לקח/ה את {medicine}?",
+  "wizard.medicineGiven": "התרופה ניתנה",
+  "wizard.skipped": "דולג",
+  "wizard.youDidIt": "!עשית את זה",
+  "wizard.braveHero": "!גיבור אמיץ",
+  "wizard.claimStars": "!תפסו את הכוכבים שלי",
+  "wizard.starsEarned": "+{stars} כוכבים!",
+  "wizard.streakUpdate": "רצף של {days} ימים!",
+  "wizard.dailyBonusEarned": "בונוס יומי! +10",
+  "wizard.feedPet": "האכל את חיית המחמד",
+  "wizard.playGame": "שחק משחק",
+  "wizard.allDone": "!סיימנו",
+  "wizard.tapToContinue": "הקש להמשך"
 }
