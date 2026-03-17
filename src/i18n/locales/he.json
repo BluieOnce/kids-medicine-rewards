@@ -211,5 +211,10 @@
   "onboarding.step3Desc": "השתמשו בכוכבים כדי להאכיל, צפו בבקיעה ובהתפתחות!",
   "onboarding.next": "הבא",
   "onboarding.skip": "דלג",
-  "onboarding.letsGo": "בואו נתחיל!"
+  "onboarding.letsGo": "בואו נתחיל!",
+
+  "settings.title": "הגדרות",
+  "settings.user": "משתמש",
+  "settings.statistics": "סטטיסטיקות",
+  "settings.manageChildren": "ניהול ילדים"
 }

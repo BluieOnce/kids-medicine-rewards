@@ -3,20 +3,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import NavBar from "@/components/ui/NavBar";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import StarDisplay from "@/components/ui/StarDisplay";
 import ProgressBar from "@/components/ui/ProgressBar";
 import PageHeader from "@/components/ui/PageHeader";
-import AdminDashboard from "@/components/parent/AdminDashboard";
 import { Dose } from "@/types";
 import { useTranslation } from "@/i18n";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { t, locale, setLocale } = useTranslation();
+  const { t } = useTranslation();
   const {
     children,
     medicines,
@@ -30,7 +29,6 @@ export default function DashboardPage() {
   } = useAppStore();
 
   const [todayDoses, setTodayDoses] = useState<Dose[]>([]);
-  const [showStats, setShowStats] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -81,21 +79,13 @@ export default function DashboardPage() {
           avatar: activeChild?.avatar || "",
         })}
         rightElement={
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setLocale(locale === "he" ? "en" : "he")}
-              className="text-sm px-2 py-1 rounded-lg bg-gray-100 font-medium"
-              title={t("language")}
-            >
-              {locale === "he" ? "EN" : "HE"}
-            </button>
-            <button
-              onClick={() => router.push("/child")}
-              className="text-sm text-blue-500 font-medium"
-            >
-              {t("dashboard.settings")}
-            </button>
-          </div>
+          <button
+            onClick={() => router.push("/settings")}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+            title={t("dashboard.settings")}
+          >
+            <span className="text-xl">⚙️</span>
+          </button>
         }
       />
 
@@ -225,22 +215,6 @@ export default function DashboardPage() {
             <p className="text-sm font-medium text-gray-600">{t("dashboard.myPet")}</p>
           </Card>
         </div>
-
-        {/* Admin Stats Toggle */}
-        {activeChildId && (
-          <div>
-            <button
-              onClick={() => setShowStats(!showStats)}
-              className="w-full flex items-center justify-center gap-2 py-2 text-sm font-medium text-blue-500 hover:text-blue-600 transition-colors"
-            >
-              <span>📊</span>
-              {showStats ? t("admin.hideStats") : t("admin.viewStats")}
-            </button>
-            <AnimatePresence>
-              {showStats && <AdminDashboard childId={activeChildId} />}
-            </AnimatePresence>
-          </div>
-        )}
 
         {/* Parent quick links */}
         <div className="flex gap-2">

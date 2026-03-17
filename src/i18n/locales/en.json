@@ -211,5 +211,10 @@
   "onboarding.step3Desc": "Use stars to feed your pet, watch it hatch and evolve!",
   "onboarding.next": "Next",
   "onboarding.skip": "Skip",
-  "onboarding.letsGo": "Let's Go!"
+  "onboarding.letsGo": "Let's Go!",
+
+  "settings.title": "Settings",
+  "settings.user": "User",
+  "settings.statistics": "Statistics",
+  "settings.manageChildren": "Manage Children"
 }
