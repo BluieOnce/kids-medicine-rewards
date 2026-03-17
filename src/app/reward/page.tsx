@@ -7,13 +7,20 @@ import NavBar from "@/components/ui/NavBar";
 import Card from "@/components/ui/Card";
 import StarDisplay from "@/components/ui/StarDisplay";
 import PageHeader from "@/components/ui/PageHeader";
+import ProgressBar from "@/components/ui/ProgressBar";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/i18n";
+
+const STREAK_MILESTONES = [3, 7, 14, 21, 30, 50, 100];
+
+function getNextMilestone(current: number): number | null {
+  return STREAK_MILESTONES.find((m) => m > current) ?? null;
+}
 
 export default function RewardPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { activeChildId, children, loadData, getRewards, getStreak } =
+  const { activeChildId, children, loadData, getRewards, getStreak, isLoaded } =
     useAppStore();
 
   useEffect(() => {
@@ -24,6 +31,20 @@ export default function RewardPage() {
   const rewards = activeChildId ? getRewards(activeChildId) : null;
   const streak = activeChildId ? getStreak(activeChildId) : null;
 
+  if (!isLoaded) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <motion.div
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+          className="text-5xl"
+        >
+          ⭐
+        </motion.div>
+      </div>
+    );
+  }
+
   if (!activeChildId || !child) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
@@ -31,6 +52,13 @@ export default function RewardPage() {
       </div>
     );
   }
+
+  const nextMilestone = getNextMilestone(streak?.current || 0);
+  const milestoneProgress = nextMilestone
+    ? ((streak?.current || 0) / nextMilestone) * 100
+    : 100;
+  const isNewRecord =
+    streak && streak.current > 0 && streak.current === streak.best;
 
   return (
     <div className="pb-24">
@@ -75,6 +103,45 @@ export default function RewardPage() {
             </Card>
           </motion.div>
         </div>
+
+        {/* New record badge */}
+        {isNewRecord && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          >
+            <Card className="text-center py-3 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+              <p className="font-bold text-purple-600">
+                🏆 {t("reward.newRecord")}
+              </p>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Next milestone progress */}
+        {nextMilestone && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card>
+              <div className="flex justify-between items-center mb-2">
+                <p className="text-sm font-medium text-gray-600">
+                  {t("reward.nextMilestone", { days: String(nextMilestone) })}
+                </p>
+                <span className="text-xs text-gray-400">
+                  {streak?.current || 0}/{nextMilestone}
+                </span>
+              </div>
+              <ProgressBar value={milestoneProgress} color="bg-orange-400" />
+              <p className="text-xs text-gray-400 mt-2 text-center">
+                {t("reward.streakKeepGoing")}
+              </p>
+            </Card>
+          </motion.div>
+        )}
 
         {/* How to earn */}
         <Card>

@@ -30,6 +30,7 @@ interface AppState {
   activeChildId: string | null;
   activePetSlot: number;
   user: AppUser | null;
+  isLoaded: boolean;
 
   // Actions: Auth
   setUser: (user: AppUser | null) => void;
@@ -77,6 +78,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeChildId: null,
   activePetSlot: 0,
   user: null,
+  isLoaded: false,
 
   setUser: (user) => {
     set({ user });
@@ -90,6 +92,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       activeChildId: null,
       activePetSlot: 0,
       user: null,
+      isLoaded: false,
     });
   },
 
@@ -97,7 +100,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const children = childRepository.getAll();
     const medicines = medicineRepository.getAll();
     const doses = doseRepository.getAll();
-    set({ children, medicines, doses });
+    set({ children, medicines, doses, isLoaded: true });
 
     // Auto-set active child if only one exists
     if (children.length === 1 && !get().activeChildId) {
