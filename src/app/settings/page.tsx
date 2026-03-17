@@ -14,7 +14,7 @@ import { useTranslation } from "@/i18n";
 export default function SettingsPage() {
   const router = useRouter();
   const { t, locale, setLocale } = useTranslation();
-  const { children, user, activeChildId, loadData, deleteChild } =
+  const { children, user, activeChildId, loadData, deleteChild, resetStore } =
     useAppStore();
   const [showStats, setShowStats] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -26,6 +26,9 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
+      // Clear in-memory state first, then sign out.
+      // AuthGuard's onAuthChange will also fire and reset storage prefix.
+      resetStore();
       const { signOut } = await import("@/lib/auth");
       await signOut();
       router.push("/login");

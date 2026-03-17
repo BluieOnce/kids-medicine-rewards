@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { setStoragePrefix } from "@/data/storage/localStorage";
+import { setStoragePrefix, resetStoragePrefix } from "@/data/storage/localStorage";
+import { useAppStore } from "@/store/useAppStore";
 import { motion } from "framer-motion";
 
 interface AuthGuardProps {
@@ -13,6 +14,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
+  const setUser = useAppStore((s) => s.setUser);
+  const resetStore = useAppStore((s) => s.resetStore);
 
   useEffect(() => {
     // Dynamic import to avoid SSR issues — Firebase should only load on the client
@@ -28,8 +31,12 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       const unsubscribe = onAuthChange((user) => {
         if (user) {
           setStoragePrefix(user.uid);
+          setUser(user);
           setStatus("authenticated");
         } else {
+          // User logged out — clear in-memory state and reset storage prefix
+          resetStore();
+          resetStoragePrefix();
           setStatus("unauthenticated");
         }
       });
@@ -37,7 +44,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       // Store cleanup function
       return () => unsubscribe();
     });
-  }, []);
+  }, [setUser, resetStore]);
 
   useEffect(() => {
     if (status === "unauthenticated" && pathname !== "/login") {

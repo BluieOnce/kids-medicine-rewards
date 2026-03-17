@@ -33,6 +33,7 @@ interface AppState {
 
   // Actions: Auth
   setUser: (user: AppUser | null) => void;
+  resetStore: () => void;
 
   // Actions: Children
   loadData: () => void;
@@ -79,6 +80,17 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setUser: (user) => {
     set({ user });
+  },
+
+  resetStore: () => {
+    set({
+      children: [],
+      medicines: [],
+      doses: [],
+      activeChildId: null,
+      activePetSlot: 0,
+      user: null,
+    });
   },
 
   loadData: () => {
