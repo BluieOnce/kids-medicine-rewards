@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { TranslationProvider } from "@/i18n";
 import AuthGuard from "@/components/auth/AuthGuard";
+import { VercelToolbar } from "@vercel/toolbar/next";
 
 export const metadata: Metadata = {
   title: "Medicine Heroes",
@@ -21,6 +22,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const shouldInjectToolbar = process.env.NODE_ENV === "development";
   return (
     <html lang="he" dir="rtl" suppressHydrationWarning>
       <body className="bg-gradient-to-b from-blue-50 to-purple-50 min-h-dvh">
@@ -29,6 +31,7 @@ export default function RootLayout({
             {children}
           </AuthGuard>
         </TranslationProvider>
+        {shouldInjectToolbar && <VercelToolbar />}
       </body>
     </html>
   );
