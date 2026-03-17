@@ -55,6 +55,15 @@ export const rewardService = {
     return true;
   },
 
+  addStars(childId: string, amount: number): void {
+    const rewards = rewardsRepository.getByChildId(childId);
+    const updated: Rewards = {
+      ...rewards,
+      stars: rewards.stars + amount,
+    };
+    rewardsRepository.save(updated);
+  },
+
   getRewards(childId: string): Rewards {
     return rewardsRepository.getByChildId(childId);
   },

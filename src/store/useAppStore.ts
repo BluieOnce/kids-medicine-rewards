@@ -61,6 +61,7 @@ interface AppState {
   // Actions: Rewards
   getRewards: (childId: string) => Rewards;
   getStreak: (childId: string) => { current: number; best: number };
+  addStars: (childId: string, amount: number) => void;
 
   // Actions: Pet (multi-pet with slots)
   getPet: (childId: string, slotIndex?: number) => Pet | null;
@@ -211,6 +212,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   getStreak: (childId) => {
     return streakService.getStreak(childId);
+  },
+
+  addStars: (childId, amount) => {
+    rewardService.addStars(childId, amount);
   },
 
   // ── Pet actions (multi-slot) ──
