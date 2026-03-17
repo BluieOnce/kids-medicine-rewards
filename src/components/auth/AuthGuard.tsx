@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { setStoragePrefix } from "@/data/storage/localStorage";
+import { setStoragePrefix, resetStoragePrefix } from "@/data/storage/localStorage";
+import { useAppStore } from "@/store/useAppStore";
 import { motion } from "framer-motion";
 
 interface AuthGuardProps {
@@ -13,6 +14,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
+  const setUser = useAppStore((s) => s.setUser);
+  const resetStore = useAppStore((s) => s.resetStore);
 
   useEffect(() => {
     // Dynamic import to avoid SSR issues — Firebase should only load on the client
@@ -28,8 +31,12 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       const unsubscribe = onAuthChange((user) => {
         if (user) {
           setStoragePrefix(user.uid);
+          setUser(user);
           setStatus("authenticated");
         } else {
+          // User logged out — clear in-memory state and reset storage prefix
+          resetStore();
+          resetStoragePrefix();
           setStatus("unauthenticated");
         }
       });
@@ -37,7 +44,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       // Store cleanup function
       return () => unsubscribe();
     });
-  }, []);
+  }, [setUser, resetStore]);
 
   useEffect(() => {
     if (status === "unauthenticated" && pathname !== "/login") {
@@ -50,15 +57,30 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   if (status === "loading") {
     return (
-      <div className="min-h-dvh flex flex-col items-center justify-center">
+      <div className="min-h-dvh flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-purple-50">
         <motion.div
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="text-6xl mb-4"
+          animate={{ scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="text-7xl mb-4"
         >
           💊
         </motion.div>
-        <p className="text-gray-400 text-sm">Loading...</p>
+        <motion.h2
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-xl font-bold text-gray-700 mb-2"
+        >
+          Medicine Heroes
+        </motion.h2>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="text-gray-400 text-sm"
+        >
+          Loading...
+        </motion.div>
       </div>
     );
   }

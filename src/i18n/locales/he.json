@@ -192,5 +192,29 @@
   "balloon.playAgain": "שחק שוב",
   "balloon.score": "ניקוד: {score}",
 
-  "language": "שפה"
+  "language": "שפה",
+
+  "auth.loadingApp": "טוען...",
+  "login.subtitle": "הופכים את זמן התרופה לכיף ומתגמל",
+  "login.feature1": "מעקב תרופות",
+  "login.feature1Desc": "לא מפספסים מנה",
+  "login.feature2": "צבירת כוכבים",
+  "login.feature2Desc": "פרסים על כל מנה",
+  "login.feature3": "גידול חיות",
+  "login.feature3Desc": "בקיעה והתפתחות",
+
+  "onboarding.step1Title": "מעקב תרופות",
+  "onboarding.step1Desc": "הגדירו לוחות זמנים וקבלו תזכורות. לא מפספסים מנה!",
+  "onboarding.step2Title": "צבירת כוכבים ופרסים",
+  "onboarding.step2Desc": "כל מנה מרוויחה כוכבים! בנו רצפים ופתחו בונוסים.",
+  "onboarding.step3Title": "גדלו חיית מחמד",
+  "onboarding.step3Desc": "השתמשו בכוכבים כדי להאכיל, צפו בבקיעה ובהתפתחות!",
+  "onboarding.next": "הבא",
+  "onboarding.skip": "דלג",
+  "onboarding.letsGo": "בואו נתחיל!",
+
+  "settings.title": "הגדרות",
+  "settings.user": "משתמש",
+  "settings.statistics": "סטטיסטיקות",
+  "settings.manageChildren": "ניהול ילדים"
 }

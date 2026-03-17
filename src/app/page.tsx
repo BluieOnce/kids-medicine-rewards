@@ -1,64 +1,37 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
 import { motion } from "framer-motion";
-import Button from "@/components/ui/Button";
-import { useTranslation } from "@/i18n";
 
 export default function Home() {
   const router = useRouter();
   const { children, loadData } = useAppStore();
-  const { t } = useTranslation();
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     loadData();
+    setLoaded(true);
   }, [loadData]);
 
   useEffect(() => {
+    if (!loaded) return;
     if (children.length > 0) {
       router.replace("/dashboard");
+    } else {
+      router.replace("/onboarding");
     }
-  }, [children, router]);
+  }, [children, router, loaded]);
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-6 text-center">
+    <div className="min-h-dvh flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-purple-50">
       <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
-        className="text-8xl mb-6"
+        animate={{ scale: [1, 1.15, 1] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        className="text-7xl"
       >
         💊
-      </motion.div>
-
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="text-3xl font-bold text-gray-800 mb-2"
-      >
-        {t("home.title")}
-      </motion.h1>
-
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="text-gray-500 mb-8"
-      >
-        {t("home.subtitle")}
-      </motion.p>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
-        <Button size="lg" onClick={() => router.push("/child/new")}>
-          {t("home.getStarted")}
-        </Button>
       </motion.div>
     </div>
   );
