@@ -225,5 +225,26 @@
   "settings.title": "Settings",
   "settings.user": "User",
   "settings.statistics": "Statistics",
-  "settings.manageChildren": "Manage Children"
+  "settings.manageChildren": "Manage Children",
+
+  "wizard.medicineFor": "{name}'s medicine",
+  "wizard.startMedicineTime": "Start medicine time",
+  "wizard.skipForNow": "Skip for now",
+  "wizard.feelingNervous": "Feeling nervous?",
+  "wizard.tryCalmFirst": "Try a calm tool first",
+  "wizard.imReady": "I'm ready!",
+  "wizard.backToCalm": "Back",
+  "wizard.didChildTake": "Did {name} take {medicine}?",
+  "wizard.medicineGiven": "Medicine given",
+  "wizard.skipped": "Skipped",
+  "wizard.youDidIt": "You did it!",
+  "wizard.braveHero": "Brave hero!",
+  "wizard.claimStars": "Claim my stars!",
+  "wizard.starsEarned": "+{stars} stars!",
+  "wizard.streakUpdate": "{days} day streak!",
+  "wizard.dailyBonusEarned": "Daily bonus! +10",
+  "wizard.feedPet": "Feed my pet",
+  "wizard.playGame": "Play a game",
+  "wizard.allDone": "All done!",
+  "wizard.tapToContinue": "Tap to continue"
 }

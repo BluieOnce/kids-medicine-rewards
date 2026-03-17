@@ -55,6 +55,8 @@ interface AppState {
   // Actions: Doses
   generateTodayDoses: () => void;
   completeDose: (doseId: string) => { stars: number; dose: Dose } | null;
+  confirmDose: (doseId: string) => Dose | null;
+  claimReward: (doseId: string) => { stars: number; streak: { current: number; best: number }; dailyBonus: boolean } | null;
   skipDose: (doseId: string) => void;
   getTodayDoses: (childId: string) => Dose[];
 
@@ -195,6 +197,36 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     set({ doses: doseRepository.getAll() });
     return { stars, dose };
+  },
+
+  confirmDose: (doseId) => {
+    const dose = doseService.completeDose(doseId, false);
+    if (!dose) return null;
+    set({ doses: doseRepository.getAll() });
+    return dose;
+  },
+
+  claimReward: (doseId) => {
+    const dose = doseRepository.getById(doseId);
+    if (!dose || dose.rewardGranted) return null;
+    if (dose.status !== "completed" && dose.status !== "late") return null;
+
+    const stars = rewardService.grantDoseReward(dose.childId, dose);
+    const streak = streakService.updateStreak(dose.childId);
+
+    // Mark reward as granted
+    const updated = { ...dose, rewardGranted: true };
+    doseRepository.save(updated);
+
+    // Check daily bonus
+    const progress = doseService.getTodayProgress(dose.childId);
+    const dailyBonus = progress.pending === 0 && progress.total > 0 && progress.skipped === 0;
+    if (dailyBonus) {
+      rewardService.grantDailyBonus(dose.childId);
+    }
+
+    set({ doses: doseRepository.getAll() });
+    return { stars, streak, dailyBonus };
   },
 
   skipDose: (doseId) => {
