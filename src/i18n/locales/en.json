@@ -192,5 +192,24 @@
   "balloon.playAgain": "Play Again",
   "balloon.score": "Score: {score}",
 
-  "language": "Language"
+  "language": "Language",
+
+  "auth.loadingApp": "Loading...",
+  "login.subtitle": "Making medicine time fun and rewarding",
+  "login.feature1": "Track Medicines",
+  "login.feature1Desc": "Never miss a dose",
+  "login.feature2": "Earn Stars",
+  "login.feature2Desc": "Rewards for every dose",
+  "login.feature3": "Grow Pets",
+  "login.feature3Desc": "Hatch & evolve friends",
+
+  "onboarding.step1Title": "Track Medicines",
+  "onboarding.step1Desc": "Set up schedules and get reminders. Never miss a dose again!",
+  "onboarding.step2Title": "Earn Stars & Rewards",
+  "onboarding.step2Desc": "Every dose earns stars! Build streaks and unlock bonuses.",
+  "onboarding.step3Title": "Grow Your Pet",
+  "onboarding.step3Desc": "Use stars to feed your pet, watch it hatch and evolve!",
+  "onboarding.next": "Next",
+  "onboarding.skip": "Skip",
+  "onboarding.letsGo": "Let's Go!"
 }
