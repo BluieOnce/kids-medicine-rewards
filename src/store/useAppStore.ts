@@ -19,7 +19,8 @@ import { petRepository } from "@/data/repositories/petRepository";
 import { doseService } from "@/domain/dose/doseService";
 import { rewardService } from "@/domain/rewards/rewardService";
 import { streakService } from "@/domain/streak/streakService";
-import { petService } from "@/domain/pet/petService";
+import { petService, FeedResult } from "@/domain/pet/petService";
+import type { AppUser } from "@/lib/auth";
 
 interface AppState {
   // Data
@@ -27,6 +28,11 @@ interface AppState {
   medicines: Medicine[];
   doses: Dose[];
   activeChildId: string | null;
+  activePetSlot: number;
+  user: AppUser | null;
+
+  // Actions: Auth
+  setUser: (user: AppUser | null) => void;
 
   // Actions: Children
   loadData: () => void;
@@ -54,11 +60,13 @@ interface AppState {
   getRewards: (childId: string) => Rewards;
   getStreak: (childId: string) => { current: number; best: number };
 
-  // Actions: Pet
-  getPet: (childId: string) => Pet | null;
-  createPet: (childId: string, petType: PetType, name: string) => Pet;
-  feedPet: (childId: string) => Pet | null;
-  playWithPet: (childId: string) => Pet | null;
+  // Actions: Pet (multi-pet with slots)
+  getPet: (childId: string, slotIndex?: number) => Pet | null;
+  getPets: (childId: string) => Pet[];
+  createPet: (childId: string, slotIndex: number, name: string, unlockedPets: PetType[]) => Pet;
+  feedPet: (childId: string, slotIndex?: number) => FeedResult | null;
+  playWithPet: (childId: string, slotIndex?: number) => Pet | null;
+  setActivePetSlot: (slot: number) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -66,6 +74,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   medicines: [],
   doses: [],
   activeChildId: null,
+  activePetSlot: 0,
+  user: null,
+
+  setUser: (user) => {
+    set({ user });
+  },
 
   loadData: () => {
     const children = childRepository.getAll();
@@ -184,23 +198,36 @@ export const useAppStore = create<AppState>((set, get) => ({
     return streakService.getStreak(childId);
   },
 
-  getPet: (childId) => {
-    return petService.getPet(childId);
+  // ── Pet actions (multi-slot) ──
+
+  getPet: (childId, slotIndex) => {
+    const slot = slotIndex ?? get().activePetSlot;
+    return petService.getPet(childId, slot);
   },
 
-  createPet: (childId, petType, name) => {
-    return petService.createPet(childId, petType, name);
+  getPets: (childId) => {
+    return petService.getPets(childId);
   },
 
-  feedPet: (childId) => {
-    const pet = petService.feedPet(childId);
-    if (pet) {
+  createPet: (childId, slotIndex, name, unlockedPets) => {
+    return petService.createPet(childId, slotIndex, name, unlockedPets);
+  },
+
+  feedPet: (childId, slotIndex) => {
+    const slot = slotIndex ?? get().activePetSlot;
+    const result = petService.feedPet(childId, slot);
+    if (result) {
       rewardService.spendStars(childId, petService.getFeedCost());
     }
-    return pet;
+    return result;
   },
 
-  playWithPet: (childId) => {
-    return petService.playWithPet(childId);
+  playWithPet: (childId, slotIndex) => {
+    const slot = slotIndex ?? get().activePetSlot;
+    return petService.playWithPet(childId, slot);
+  },
+
+  setActivePetSlot: (slot) => {
+    set({ activePetSlot: slot });
   },
 }));

@@ -1,14 +1,51 @@
-const STORAGE_PREFIX = "app:v1:";
+const DEFAULT_PREFIX = "app:v1:";
+let currentPrefix = DEFAULT_PREFIX;
 
-export const StorageKeys = {
-  CHILDREN: `${STORAGE_PREFIX}children`,
-  MEDICINES: `${STORAGE_PREFIX}medicines`,
-  DOSES: `${STORAGE_PREFIX}doses`,
-  REWARDS: `${STORAGE_PREFIX}rewards`,
-  PET: `${STORAGE_PREFIX}pet`,
-  REMINDERS: `${STORAGE_PREFIX}reminders`,
-  GAME_SCORES: `${STORAGE_PREFIX}gameScores`,
-} as const;
+function buildKeys(prefix: string) {
+  return {
+    CHILDREN: `${prefix}children`,
+    MEDICINES: `${prefix}medicines`,
+    DOSES: `${prefix}doses`,
+    REWARDS: `${prefix}rewards`,
+    PET: `${prefix}pet`,
+    REMINDERS: `${prefix}reminders`,
+    GAME_SCORES: `${prefix}gameScores`,
+  } as const;
+}
+
+export let StorageKeys = buildKeys(DEFAULT_PREFIX);
+
+/**
+ * Scope all storage keys by a user ID.
+ * Also performs a one-time migration of unscoped data into the user-scoped keys.
+ */
+export function setStoragePrefix(uid: string): void {
+  const newPrefix = `app:v1:${uid}:`;
+  if (currentPrefix === newPrefix) return;
+
+  const oldKeys = buildKeys(DEFAULT_PREFIX);
+  const newKeys = buildKeys(newPrefix);
+
+  // One-time migration: if user-scoped data doesn't exist yet but unscoped data does,
+  // copy the unscoped data into the user-scoped keys
+  if (isClient()) {
+    const migrationFlag = `${newPrefix}migrated`;
+    if (!localStorage.getItem(migrationFlag)) {
+      const keyPairs = Object.keys(oldKeys) as (keyof typeof oldKeys)[];
+      for (const key of keyPairs) {
+        const oldData = localStorage.getItem(oldKeys[key]);
+        const newData = localStorage.getItem(newKeys[key]);
+        if (oldData && !newData) {
+          localStorage.setItem(newKeys[key], oldData);
+        }
+      }
+      localStorage.setItem(migrationFlag, "true");
+    }
+  }
+
+  currentPrefix = newPrefix;
+  StorageKeys = buildKeys(newPrefix);
+}
 
 function isClient(): boolean {
   return typeof window !== "undefined";

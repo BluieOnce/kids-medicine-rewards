@@ -1,85 +1,95 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
 import { useAppStore } from "@/store/useAppStore";
-import { PetType } from "@/types";
+import { PetType, PetStage } from "@/types";
+import { petService } from "@/domain/pet/petService";
 import { motion, AnimatePresence } from "framer-motion";
 import PageHeader from "@/components/ui/PageHeader";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import ProgressBar from "@/components/ui/ProgressBar";
 import StarDisplay from "@/components/ui/StarDisplay";
+import EvolutionAnimation from "@/components/child/EvolutionAnimation";
+import HatchAnimation from "@/components/child/HatchAnimation";
 import { useTranslation } from "@/i18n";
 
-const petEmojis: Record<PetType, string> = {
-  cat: "🐱",
-  dog: "🐶",
-  bunny: "🐰",
-  dragon: "🐲",
-};
-
 export default function PetPage() {
-  const router = useRouter();
   const { t } = useTranslation();
   const {
     activeChildId,
+    activePetSlot,
     loadData,
     getPet,
+    getPets,
     createPet,
     feedPet,
     playWithPet,
     getRewards,
+    getStreak,
+    setActivePetSlot,
   } = useAppStore();
 
   const [feedAnim, setFeedAnim] = useState(false);
   const [playAnim, setPlayAnim] = useState(false);
+  const [showEvolution, setShowEvolution] = useState(false);
+  const [evolutionStage, setEvolutionStage] = useState<PetStage>("baby");
+  const [evolutionEmoji, setEvolutionEmoji] = useState("");
+  const [showHatch, setShowHatch] = useState(false);
+  const [hatchType, setHatchType] = useState<PetType>("cat");
+  const [viewMode, setViewMode] = useState<"slots" | "detail">("slots");
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  const petOptions: { type: PetType; labelKey: string }[] = [
-    { type: "cat", labelKey: "pet.cat" },
-    { type: "dog", labelKey: "pet.dog" },
-    { type: "bunny", labelKey: "pet.bunny" },
-    { type: "dragon", labelKey: "pet.dragon" },
-  ];
-
-  const pet = activeChildId ? getPet(activeChildId) : null;
   const rewards = activeChildId ? getRewards(activeChildId) : null;
+  const streak = activeChildId ? getStreak(activeChildId) : null;
+  const bestStreak = streak?.best ?? 0;
+  const unlockedPets = petService.getUnlockedPets(bestStreak);
+  const petOrder = petService.getPetOrder();
+  const allPets = activeChildId ? getPets(activeChildId) : [];
 
-  // Pet creation screen
-  if (activeChildId && !pet) {
-    return (
-      <div className="pb-8">
-        <PageHeader title={t("pet.chooseTitle")} showBack />
-        <div className="px-4 space-y-4 mt-4">
-          <p className="text-gray-500 text-center">
-            {t("pet.pickInstruction")}
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            {petOptions.map((opt) => (
-              <Card
-                key={opt.type}
-                onClick={() => {
-                  const label = t(opt.labelKey);
-                  const name = prompt(t("pet.namePrompt", { type: label })) || label;
-                  createPet(activeChildId, opt.type, name);
-                }}
-                className="text-center py-6"
-              >
-                <span className="text-6xl">{petEmojis[opt.type]}</span>
-                <p className="mt-2 font-medium">{t(opt.labelKey)}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleAdoptEgg = useCallback(
+    (slotIndex: number) => {
+      if (!activeChildId) return;
+      const eggName = prompt(t("pet.nameYourEgg"));
+      if (!eggName) return;
+      createPet(activeChildId, slotIndex, eggName, unlockedPets);
+      setActivePetSlot(slotIndex);
+      setViewMode("detail");
+    },
+    [activeChildId, createPet, setActivePetSlot, t, unlockedPets]
+  );
 
-  if (!pet || !activeChildId) {
+  const handleFeed = useCallback(() => {
+    if (!activeChildId || !rewards || rewards.stars < 5) return;
+    const result = feedPet(activeChildId, activePetSlot);
+    if (!result) return;
+
+    setFeedAnim(true);
+    setTimeout(() => setFeedAnim(false), 1000);
+
+    if (result.hatched && result.revealedType) {
+      setHatchType(result.revealedType);
+      setTimeout(() => setShowHatch(true), 600);
+    } else if (result.evolved && result.newStage) {
+      setEvolutionStage(result.newStage);
+      setEvolutionEmoji(
+        petService.getPetEmoji(result.pet.petType, result.pet.level, true)
+      );
+      setTimeout(() => setShowEvolution(true), 600);
+    }
+  }, [activeChildId, activePetSlot, feedPet, rewards]);
+
+  const handlePlay = useCallback(() => {
+    if (!activeChildId) return;
+    playWithPet(activeChildId, activePetSlot);
+    setPlayAnim(true);
+    setTimeout(() => setPlayAnim(false), 1000);
+  }, [activeChildId, activePetSlot, playWithPet]);
+
+  if (!activeChildId) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
         <p className="text-gray-400">{t("reward.selectChild")}</p>
@@ -87,34 +97,138 @@ export default function PetPage() {
     );
   }
 
+  // ── Slot selection view ──
+  if (viewMode === "slots") {
+    return (
+      <div className="pb-8">
+        <PageHeader
+          title={t("pet.chooseTitle")}
+          showBack
+          rightElement={
+            <StarDisplay count={rewards?.stars || 0} size="sm" />
+          }
+        />
+        <div className="px-4 space-y-4 mt-4">
+          <p className="text-gray-500 text-center text-sm">
+            {t("pet.slotsInstruction")}
+          </p>
+
+          <div className="grid grid-cols-2 gap-3">
+            {petOrder.map((type, index) => {
+              const isUnlocked = petService.isUnlocked(type, bestStreak);
+              const threshold = petService.getUnlockThreshold(type);
+              const existingPet = allPets.find((p) => p.slotIndex === index);
+
+              if (!isUnlocked) {
+                // Locked slot
+                return (
+                  <Card key={index} className="text-center py-6 opacity-50">
+                    <span className="text-5xl">🔒</span>
+                    <p className="mt-2 text-xs text-gray-400">
+                      {t("pet.unlockAt", { streak: threshold })}
+                    </p>
+                  </Card>
+                );
+              }
+
+              if (existingPet) {
+                // Occupied slot — show pet
+                const emoji = petService.getPetEmoji(
+                  existingPet.petType,
+                  existingPet.level,
+                  existingPet.revealedType
+                );
+                const stage = petService.getStage(existingPet.level);
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <Card
+                      onClick={() => {
+                        setActivePetSlot(index);
+                        setViewMode("detail");
+                      }}
+                      className="text-center py-6"
+                    >
+                      <span className="text-5xl">{emoji}</span>
+                      <p className="mt-1 font-medium text-sm">
+                        {existingPet.name}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {existingPet.revealedType
+                          ? t(`pet.stage.${stage}`)
+                          : t("pet.mysteryEgg")}
+                      </p>
+                    </Card>
+                  </motion.div>
+                );
+              }
+
+              // Empty unlocked slot
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Card
+                    onClick={() => handleAdoptEgg(index)}
+                    className="text-center py-6 border-2 border-dashed border-amber-300"
+                  >
+                    <span className="text-5xl">🥚</span>
+                    <p className="mt-1 text-xs text-amber-500 font-medium">
+                      {t("pet.tapToAdopt")}
+                    </p>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Detail view for active pet ──
+  const currentPet = getPet(activeChildId, activePetSlot);
+  if (!currentPet) {
+    // Pet doesn't exist in this slot, go back to slots
+    return (
+      <div className="pb-8">
+        <PageHeader title={t("pet.chooseTitle")} showBack />
+        <div className="px-4 mt-4 text-center">
+          <p className="text-gray-400">{t("pet.noPetInSlot")}</p>
+          <Button className="mt-4" onClick={() => setViewMode("slots")}>
+            {t("pet.viewAllPets")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const canFeed = (rewards?.stars || 0) >= 5;
-
-  const handleFeed = () => {
-    if (!canFeed) return;
-    feedPet(activeChildId);
-    setFeedAnim(true);
-    setTimeout(() => setFeedAnim(false), 1000);
-  };
-
-  const handlePlay = () => {
-    playWithPet(activeChildId);
-    setPlayAnim(true);
-    setTimeout(() => setPlayAnim(false), 1000);
-  };
-
-  // Re-read after actions
-  const currentPet = getPet(activeChildId);
-  const currentRewards = getRewards(activeChildId);
-
-  const petTypeKey = `pet.${pet.petType}` as const;
+  const stage = petService.getStage(currentPet.level);
+  const emoji = petService.getPetEmoji(
+    currentPet.petType,
+    currentPet.level,
+    currentPet.revealedType
+  );
+  const isEgg = !currentPet.revealedType;
+  const hatchProgress = currentPet.feedCount;
+  const hatchThreshold = petService.getHatchThreshold();
 
   return (
     <div className="pb-8">
       <PageHeader
-        title={pet.name}
+        title={currentPet.name}
         showBack
+        onBack={() => setViewMode("slots")}
         rightElement={
-          <StarDisplay count={currentRewards?.stars || 0} size="sm" />
+          <StarDisplay count={rewards?.stars || 0} size="sm" />
         }
       />
 
@@ -132,7 +246,7 @@ export default function PetPage() {
             transition={{ duration: 0.6 }}
             className="text-8xl mb-2"
           >
-            {petEmojis[currentPet?.petType || pet.petType]}
+            {emoji}
           </motion.div>
 
           <AnimatePresence>
@@ -158,12 +272,27 @@ export default function PetPage() {
             )}
           </AnimatePresence>
 
-          <p className="text-sm text-gray-400">
-            {t("pet.level", {
-              level: currentPet?.level || pet.level,
-              type: t(petTypeKey),
-            })}
-          </p>
+          {isEgg ? (
+            <div>
+              <p className="text-sm text-gray-400 mb-1">
+                {t("pet.mysteryEgg")}
+              </p>
+              <p className="text-xs text-amber-500">
+                {t("pet.hatchProgress", {
+                  current: hatchProgress,
+                  total: hatchThreshold,
+                })}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400">
+              {t("pet.levelAndStage", {
+                level: currentPet.level,
+                stage: t(`pet.stage.${stage}`),
+                type: t(`pet.${currentPet.petType}`),
+              })}
+            </p>
+          )}
         </Card>
 
         {/* Stats */}
@@ -172,20 +301,20 @@ export default function PetPage() {
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span>{t("pet.hunger")}</span>
-                <span>{currentPet?.hunger || pet.hunger}/100</span>
+                <span>{currentPet.hunger}/100</span>
               </div>
               <ProgressBar
-                value={currentPet?.hunger || pet.hunger}
+                value={currentPet.hunger}
                 color="bg-orange-400"
               />
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span>{t("pet.happiness")}</span>
-                <span>{currentPet?.happiness || pet.happiness}/100</span>
+                <span>{currentPet.happiness}/100</span>
               </div>
               <ProgressBar
-                value={currentPet?.happiness || pet.happiness}
+                value={currentPet.happiness}
                 color="bg-pink-400"
               />
             </div>
@@ -217,7 +346,29 @@ export default function PetPage() {
             {t("pet.earnMore")}
           </p>
         )}
+
+        {/* Back to all pets */}
+        <Button
+          variant="ghost"
+          className="w-full"
+          onClick={() => setViewMode("slots")}
+        >
+          {t("pet.viewAllPets")}
+        </Button>
       </div>
+
+      {/* Animations */}
+      <EvolutionAnimation
+        show={showEvolution}
+        petEmoji={evolutionEmoji}
+        newStage={evolutionStage}
+        onComplete={() => setShowEvolution(false)}
+      />
+      <HatchAnimation
+        show={showHatch}
+        petType={hatchType}
+        onComplete={() => setShowHatch(false)}
+      />
     </div>
   );
 }

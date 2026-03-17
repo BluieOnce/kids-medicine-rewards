@@ -52,17 +52,36 @@ export const RewardsSchema = z.object({
 export type Rewards = z.infer<typeof RewardsSchema>;
 
 // ── Pet Type ──
-export const PetType = z.enum(["cat", "dog", "bunny", "dragon"]);
+export const PetType = z.enum([
+  "cat",
+  "dog",
+  "bunny",
+  "dragon",
+  "hamster",
+  "parrot",
+  "turtle",
+  "unicorn",
+  "fox",
+  "panda",
+]);
 export type PetType = z.infer<typeof PetType>;
+
+// ── Pet Stage ──
+export const PetStage = z.enum(["egg", "baby", "child", "teen", "adult"]);
+export type PetStage = z.infer<typeof PetStage>;
 
 // ── Pet ──
 export const PetSchema = z.object({
+  id: z.string().uuid(),
   childId: z.string().uuid(),
   petType: PetType,
   name: z.string().min(1).max(30),
   level: z.number().int().min(1),
   happiness: z.number().int().min(0).max(100),
   hunger: z.number().int().min(0).max(100),
+  slotIndex: z.number().int().min(0).max(9),
+  feedCount: z.number().int().min(0).default(0),
+  revealedType: z.boolean().default(true),
 });
 export type Pet = z.infer<typeof PetSchema>;
 
