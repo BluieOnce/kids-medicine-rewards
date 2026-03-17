@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { TranslationProvider } from "@/i18n";
+import AuthGuard from "@/components/auth/AuthGuard";
 
 export const metadata: Metadata = {
   title: "Medicine Heroes",
@@ -24,7 +25,9 @@ export default function RootLayout({
     <html lang="he" dir="rtl" suppressHydrationWarning>
       <body className="bg-gradient-to-b from-blue-50 to-purple-50 min-h-dvh">
         <TranslationProvider>
-          {children}
+          <AuthGuard>
+            {children}
+          </AuthGuard>
         </TranslationProvider>
       </body>
     </html>

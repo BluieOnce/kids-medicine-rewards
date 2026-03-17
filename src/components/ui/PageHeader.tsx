@@ -6,12 +6,14 @@ import { useTranslation } from "@/i18n";
 interface PageHeaderProps {
   title: string;
   showBack?: boolean;
+  onBack?: () => void;
   rightElement?: React.ReactNode;
 }
 
 export default function PageHeader({
   title,
   showBack = false,
+  onBack,
   rightElement,
 }: PageHeaderProps) {
   const router = useRouter();
@@ -22,7 +24,7 @@ export default function PageHeader({
       <div className="flex items-center gap-2">
         {showBack && (
           <button
-            onClick={() => router.back()}
+            onClick={onBack ?? (() => router.back())}
             className="text-2xl p-1 -ml-1 rtl:-mr-1 rtl:ml-0"
           >
             {dir === "rtl" ? "→" : "←"}
