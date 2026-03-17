@@ -39,6 +39,10 @@ export function setStoragePrefix(uid: string): void {
           localStorage.setItem(newKeys[key], oldData);
         }
       }
+      // Clean up unscoped data so it won't be migrated to other users
+      for (const key of keyPairs) {
+        localStorage.removeItem(oldKeys[key]);
+      }
       localStorage.setItem(migrationFlag, "true");
     }
   }
